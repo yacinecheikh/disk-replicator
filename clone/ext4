@@ -26,6 +26,7 @@ def system(cmd, stdin=None, stderr=False):
 
 src, dst = sys.argv[1:]
 
+
 # TODO: lire le résultat de sfdisk -d aussi ? pour les flags
 
 out, err = system(f"/usr/sbin/blkid {src}")
