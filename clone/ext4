@@ -27,18 +27,32 @@ def system(cmd, stdin=None, stderr=False):
 src, dst = sys.argv[1:]
 
 
+# scan the partition with blkid
 # TODO: lire le résultat de sfdisk -d aussi ? pour les flags
-
 out, err = system(f"/usr/sbin/blkid {src}")
 assert err == 0
-print(out)
-#system("mount {src} mnt/src")
-"""
-    # TODO: check if the bootable flag should be set here
-from subprocess import Popen, PIPE, STDOUT
-system(mkfs.ext4 -U <uuid> dst)
-system(mount src mnt/src)
-system(mount dst mnt/dst)
-system(cp -a mnt/src/* mnt/dst)
-system(umount mnt/src mnt/dst
-"""
+args = out.split(": ")[1].split(" ")
+args = [field.split("=") for field in args]
+fields = {}
+for key, value in args:
+    fields[key] = value[1:-1]
+
+uuid = fields["UUID"]
+
+out, err = system(f"mkfs.ext4 -U {uuid} {dst}")
+assert err == 0
+print(f"created ext4 filesystem on {dst}")
+
+print(f"copying files from {src} to {dst}. this may take a long time")
+
+_, err = system(f"mount {src} mnt/src")
+assert err == 0
+_, err = system(f"mount {dst} mnt/dst")
+assert err == 0
+
+out, err = system(f"cp -a mnt/src/* mnt/dst")
+assert err == 0
+out, err = system("umount mnt/src mnt/dst")
+assert err == 0
+
+print(f"cloned contents of {src} to {dst}")

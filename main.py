@@ -1,5 +1,6 @@
 from subprocess import Popen, PIPE, STDOUT
 import sys
+import os
 
 
 # copy pasted useful snippets
@@ -94,9 +95,9 @@ def duplicate(src):
     match fields["TYPE"]:
         case "ext4":
             print(f"recognized {src} to be of type ext4")
-            out, err = system(f"clone/ext4 {src} {dst}")
-            print(out)
-            print(err)
+            os.system(f"clone/ext4 {src} {dst}")
+            #print(out)
+            #print(err)
 
     #uuid = fields["UUID"]
     #cloner = fields["TYPE"]
