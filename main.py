@@ -92,17 +92,13 @@ def duplicate(src):
     for key, value in args:
         fields[key] = value[1:-1]
 
-    match fields["TYPE"]:
-        case "ext4":
-            print(f"recognized {src} to be of type ext4")
-            os.system(f"clone/ext4 {src} {dst}")
-            #print(out)
-            #print(err)
+    cloner = fields["TYPE"]
+    if cloner not in ("ext4"):
+        print(f"unrecognized partition type: {clone}")
+        raise NotImplemented
 
-    #uuid = fields["UUID"]
-    #cloner = fields["TYPE"]
-
-    #print(f"clone/{cloner} {src} {dst}")
+    print(f"recognized {src} to be of type {cloner}")
+    os.system(f"clone/{cloner} {src} {dst}")
 
 
 # TODO: breaking news: sfdisk supports gpt tables
