@@ -3,8 +3,12 @@
 ## Status
 
 Very WIP, don't expect *anything* to work correctly.
-Currently, this tool can reproduce MBR partition tables and ext4 partitions.
-And the result won't even boot, which makes it useless for its main use case.
+Currently supported:
+* MBR and GPT partition tables
+* ext4 and swap partitions
+
+I haven't found a way to make the cloned disk bootable
+(I just know it can be done because i succeeded once by pure coincidence)
 
 ## Motivations
 
