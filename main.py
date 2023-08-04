@@ -25,12 +25,26 @@ src_disk, dst_disk = sys.argv[1:]
 system("mkdir mnt mnt/src mnt/dst")
 
 
+# TODO: move this to the main mbr/gpt branching
+# TODO: merge gpt and mbr codes (same commands)
 def save_mbr():
     out, err = system(f"sfdisk -d {src_disk} > part_table0")
     assert err == 0
     print(f"wrote partition table of {src_disk} to part_table0")
 
+def save_gpt():
+    out, err = system(f"sfdisk -d {src_disk} > part_table0")
+    assert err == 0
+    print(f"wrote partition table of {src_disk} to part_table0")
+
 def restore_mbr():
+    # can fail if the disk is mounted
+    out, err = system(f"cat part_table0 | sfdisk {dst_disk}")
+    assert err == 0
+    print(f"applied partition table to {dst_disk}")
+
+def restore_gpt():
+    # can fail if the disk is mounted
     out, err = system(f"cat part_table0 | sfdisk {dst_disk}")
     assert err == 0
     print(f"applied partition table to {dst_disk}")
@@ -51,6 +65,24 @@ def check_mbr():
     system("rm part_table2")
 
     print("checked cloned partition table against original")
+
+def check_gpt():
+    out, ret = system(f"sfdisk -d {dst_disk} > part_table1")
+    assert ret == 0
+    print(f"wrote partition table of {dst_disk} to part_table1")
+
+    # dirty patch
+    # may remove if useless, but it's a security against myself
+    # replace name of {dst_drive} by {src_drive} before diffing
+    with open("part_table1") as f:
+        with open("part_table2", "w") as g:
+            g.write(f.read().replace(dst_disk, src_disk))
+    out, ret = system("diff part_table0 part_table2")
+    assert out == ""
+    system("rm part_table2")
+
+    print("checked cloned partition table against original")
+
 
 
 def list_partitions():
@@ -93,9 +125,10 @@ def duplicate(src):
         fields[key] = value[1:-1]
 
     cloner = fields["TYPE"]
-    if cloner not in ("ext4"):
-        print(f"unrecognized partition type: {clone}")
-        raise NotImplemented
+    if not os.path.exists(f"clone/{cloner}"):
+    #if cloner not in ("ext4"):
+        print(f"unrecognized partition type: {cloner}")
+        raise NotImplementedError
 
     print(f"recognized {src} to be of type {cloner}")
     os.system(f"clone/{cloner} {src} {dst}")
@@ -104,15 +137,22 @@ def duplicate(src):
 # TODO: breaking news: sfdisk supports gpt tables
 # parse output of sfdisk instead
 out, err = system(f"sgdisk --backup=part_table0 {src_disk}")
+out, err = system(f"sfdisk -d {src_disk}")
 assert err == 0
-if "Found invalid GPT and valid MBR" in out:
+if out.startswith("label: dos"):
+    # MBR partition table
     print("found MBR partition table")
     save_mbr()
     restore_mbr()
     check_mbr()
-else:
+elif out.startswith("label: gpt"):
     print("found GPT partition table")
-    raise NotImplemented
+    save_gpt()
+    restore_gpt()
+    check_gpt()
+else:
+    print("unknown partition table")
+    raise NotImplementedError
 
 # TODO: find something to do with partition info (currently not even used nor useable)
 # TODO: better: stop scanning everything ?
