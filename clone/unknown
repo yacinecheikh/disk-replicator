@@ -1,0 +1,10 @@
+#!/usr/bin/python3
+import sys
+sys.path[0] = sys.path[0][:-6]
+from snippets import system
+
+src, dst = sys.argv[1:]
+
+out, err = system(f"dd if={src} of={dst}")
+assert err == 0
+print(f"{src} has been copied to {dst}")
