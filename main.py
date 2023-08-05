@@ -27,11 +27,9 @@ def duplicate(src):
     dst = src.replace(src_disk, dst_disk)
     # scan the partition to get its layout type
     out, err = system(f"/usr/sbin/blkid {src}")
-    print(out)
     assert err == 0
     args = out.split(": ")[1]
-    print(args.split(" "))
-    fields = parseargs(out.split(": ")[1])
+    fields = parseargs(args)
 
     cloner = fields["TYPE"]
     if os.path.exists(f"clone/{cloner}"):
