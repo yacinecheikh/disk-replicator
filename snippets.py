@@ -27,12 +27,11 @@ def system(cmd, stdin=None, stderr=False):
 
 
 def parseargs(parameters):
-    'UUID="..." TYPE="..." -> dict()'
-    # args = [arg.split("=") for arg in parameters.split(" ")]
-    # return {key: val[1:-1] for key, val in args}
-    args = parameters.split(" ")
+    "parse commandline arguments (used for the results of blkid and sfdisk -d)"
+    out, _ = system(f"./parseargs {parameters}")
+    args = eval(out)
     fields = {}
-    for arg in args:
-        key, val = arg.split("=")
-        fields[key] = val[1:-1]  # '"ext4"' -> 'ext4'
+    for key, val in args:
+        fields[key] = val
+
     return fields
