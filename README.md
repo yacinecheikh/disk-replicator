@@ -7,8 +7,8 @@ Currently supported:
 * MBR and GPT partition tables
 * ext4 and swap partitions
 
-I haven't found a way to make the cloned disk bootable
-(I just know it can be done because i succeeded once by pure coincidence)
+I haven't found a way to make the cloned disk bootable for MBR partitions yet
+the bootable GPT (extended partition tables) can be reproduced, but has not been tested from the script.
 
 ## Motivations
 
