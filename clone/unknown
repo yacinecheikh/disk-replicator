@@ -6,5 +6,6 @@ from snippets import system
 src, dst = sys.argv[1:]
 
 out, err = system(f"dd if={src} of={dst}")
+print(out)
 assert err == 0
 print(f"{src} has been copied to {dst}")

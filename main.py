@@ -27,17 +27,21 @@ def duplicate(src):
     dst = src.replace(src_disk, dst_disk)
     # scan the partition to get its layout type
     out, err = system(f"/usr/sbin/blkid {src}")
+    print(out)
     assert err == 0
+    args = out.split(": ")[1]
+    print(args.split(" "))
     fields = parseargs(out.split(": ")[1])
 
     cloner = fields["TYPE"]
-    if not os.path.exists(f"clone/{cloner}"):
+    if os.path.exists(f"clone/{cloner}"):
+        print(f"recognized {src} to be of type {cloner}")
+        # system() would block until the cloning completes
+        os.system(f"clone/{cloner} {src} {dst}")
+    else:
         print(f"unrecognized partition type: {cloner}")
-        raise NotImplementedError
-
-    print(f"recognized {src} to be of type {cloner}")
-    # system() would block until the cloning completes
-    os.system(f"clone/{cloner} {src} {dst}")
+        print("will use the generic dd cloner (will not optimize)")
+        os.system(f"clone/unknown {src} {dst}")
 
 
 table, err = system(f"sfdisk -d {src_disk}")
