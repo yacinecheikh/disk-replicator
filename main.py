@@ -16,7 +16,9 @@ system("mkdir mnt mnt/src mnt/dst")
 
 
 def list_partitions(dev):
-    info, err = system("sfdisk -d {dev}")
+    info, err = system(f"sfdisk -d {dev}")
+    if debug:
+        print(info)
     assert err == 0
     # string parsing code, don't try to understand it
     lines = info.split("\n")
@@ -30,8 +32,7 @@ def list_partitions(dev):
     return partitions
 
 
-def duplicate(src):
-    dst = src.replace(src_disk, dst_disk)
+def duplicate(src, dst):
     # scan the partition to get its layout type
     out, err = system(f"/usr/sbin/blkid {src}")
     assert err == 0
@@ -78,6 +79,7 @@ system("rm part_table1")
 src_partitions = list_partitions(src_disk)
 dst_partitions = list_partitions(dst_disk)
 if debug:
+    print("source and destination partitons:")
     print(src_partitions)
     print(dst_partitions)
 
