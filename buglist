@@ -1,0 +1,2 @@
+#1
+when duplicating between real devices (/dev/sdXY) and nbd devices (/dev/nbdXpY), the main script uses the same partition naming scheme and makes wrong names (like /dev/sdXpY)
