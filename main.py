@@ -9,8 +9,9 @@ src_disk, dst_disk = sys.argv[1:]
 system("mkdir mnt mnt/src mnt/dst")
 
 
-def list_partitions():
-    info, _ = system("cat part_table0")
+def list_partitions(dev):
+    info, err = system("sfdisk -d {dev}")
+    assert err == 0
     # string parsing code, don't try to understand it
     lines = info.split("\n")
     partitions = []
@@ -56,6 +57,7 @@ else:
 with open("part_table0", "w") as f:
     f.write(table)
 out, err = system(f"cat part_table0 | sfdisk {dst_disk}")
+print(out)
 assert err == 0
 
 # basic check, probably useless
@@ -66,7 +68,7 @@ assert out == ""
 system("rm part_table1")
 
 # clone individual partitions
-partitions = list_partitions()
+partitions = list_partitions(src_disk)
 for partition in partitions:
     duplicate(partition)
 
