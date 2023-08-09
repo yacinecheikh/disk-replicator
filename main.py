@@ -5,7 +5,13 @@ import os
 from snippets import system, parseargs
 
 
-src_disk, dst_disk = sys.argv[1:]
+src_disk, dst_disk = sys.argv[1:3]
+
+debug = False
+
+if len(sys.argv) == 4 and sys.argv[3] == "debug":
+    debug = True
+
 system("mkdir mnt mnt/src mnt/dst")
 
 
@@ -57,7 +63,8 @@ else:
 with open("part_table0", "w") as f:
     f.write(table)
 out, err = system(f"cat part_table0 | sfdisk {dst_disk}")
-print(out)
+if debug:
+    print(out)
 assert err == 0
 
 # basic check, probably useless
@@ -68,7 +75,12 @@ assert out == ""
 system("rm part_table1")
 
 # clone individual partitions
-partitions = list_partitions(src_disk)
-for partition in partitions:
-    duplicate(partition)
+src_partitions = list_partitions(src_disk)
+dst_partitions = list_partitions(dst_disk)
+if debug:
+    print(src_partitions)
+    print(dst_partitions)
+
+for src, dst in zip(src_partitions, dst_partitions):
+    duplicate(src, dst)
 
