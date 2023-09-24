@@ -36,10 +36,13 @@ You can also restart your computer.
 
 ## Motivations
 
-I just wanted to be able to make 200To dynamic virtual drives and not have to care about virt-sparsify writing 199To of zeros on my physical disks.
+The only existing solution I know for virtual disk optimization is virt-sparsify.
+However, virt-sparsify needs to copy most of the disk contents, including implicit zero bytes, which requires a lot of space if the dynamic virtual disk is large.
+Virt-sparsify is also specifically made for qemu virtual disks, whereas this tool can be used for any disk, virtual or not (or both), as it relies on qemu-nbd to connect block devices.
+This means it can be used to clone a virtual disk into a usb key for example, or the opposite (doing so requires some advanced understanding on how partitions work on the operating system, but it is possible as I did it for myself).
 
-Everything the script does can be made manually by using standard tools like gparted on the disks.
-The only "new" part is replicating partitions and files instead of using virt-sparsify (also done with standard partitioning tools).
+This tool is also very simple. The main script is about 100 lines of python, and most of that is calling commands in bash.
+Everything the script does can be made manually by using standard partitioning tools like gparted on virtual disks with qemu-nbd.
 
 ## How it works
 
